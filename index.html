@@ -1059,7 +1059,7 @@
       // }
 
       function startLanterns() {
-        const initialLanternCount = 6;
+        const initialLanternCount = 10;
 
         for (let i = 0; i < initialLanternCount; i++) {
           setTimeout(() => {
@@ -1067,7 +1067,7 @@
           }, i * 1100);
         }
         function scheduleNextLantern() {
-          const nextDelay = rand(2500, 4000);
+          const nextDelay = rand(1500, 4000);
 
           setTimeout(() => {
             createLantern();
@@ -1087,11 +1087,11 @@
       }
       const sentences = [
         `${girlNames} à, Trung Thu sắp tới rồi, tự nhiên anh chỉ nghĩ đến việc được ở cạnh em.`,
-        "Anh muốn dành một buổi tối chỉ để đi cùng em, không vội vã, không lo toan.",
-        "Mình có thể cùng nhau đi ngắm đèn lồng, ăn chút bánh Trung Thu, rồi lang thang nói chuyện.",
-        "Không cần gì quá cầu kỳ, chỉ cần có nhau là anh thấy đủ vui rồi.",
-        "Trung Thu năm nay, điều anh mong nhất không phải bánh hay đèn lồng, mà là được ở cạnh em.",
-        "Và anh hy vọng mỗi mùa trăng sau này vẫn sẽ có em bên cạnh.",
+        // "Anh muốn dành một buổi tối chỉ để đi cùng em, không vội vã, không lo toan.",
+        // "Mình có thể cùng nhau đi ngắm đèn lồng, ăn chút bánh Trung Thu, rồi lang thang nói chuyện.",
+        // "Không cần gì quá cầu kỳ, chỉ cần có nhau là anh thấy đủ vui rồi.",
+        // "Trung Thu năm nay, điều anh mong nhất không phải bánh hay đèn lồng, mà là được ở cạnh em.",
+        // "Và anh hy vọng mỗi mùa trăng sau này vẫn sẽ có em bên cạnh.",
       ];
       const config = {
         wordInDelay: 150,
@@ -1148,12 +1148,12 @@
         answerContent.hidden = false;
         if (answer === "yes") {
           answerTitle.textContent = "Anh vui lắm ♥";
-          answerMessage.textContent =
-            "Vậy thì hẹn em, không chỉ Trung Thu năm nay, mà cả những mùa trăng sau nữa. 🌕❤️";
+          answerMessage.innerHTML =
+            "Vậy thì hẹn em, không chỉ Trung Thu năm nay, mà cả những mùa trăng sau nữa. 🌕❤️<br/> Ấn vào lồng đèn đang bay lên có bất ngờ nha. 😘";
         } else {
           answerTitle.textContent = "Anh sẽ chờ em nhé ✦";
-          answerMessage.textContent =
-            "Em cứ suy nghĩ thật thoải mái nhé. Dù thế nào, anh vẫn mong em sẽ có một mùa Trung Thu thật vui.";
+          answerMessage.innerHTML =
+            "Em cứ suy nghĩ thật thoải mái nhé. Dù thế nào, anh vẫn mong em sẽ có một mùa Trung Thu thật vui.<br/> Ấn vào lồng đèn đang bay lên có bất ngờ nha. 😘";
         }
       }
       function closeMainDialogAndEnableLanterns() {

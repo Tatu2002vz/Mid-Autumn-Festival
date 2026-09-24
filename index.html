@@ -1,0 +1,1264 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <link rel="icon" type="image/png" href="images/iconHeader.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+      rel="stylesheet"
+    />
+    <title>Một mùa trăng dành cho Thương</title>
+    <style>
+      :root {
+        --bg-top: #000;
+        --bg-mid: #050310;
+        --bg-bottom: #0c0620;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: radial-gradient(
+          ellipse at 50% 100%,
+          var(--bg-bottom) 0%,
+          var(--bg-mid) 45%,
+          var(--bg-top) 80%
+        );
+        padding-top: env(safe-area-inset-top, 0px);
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+      }
+      #sky {
+        position: fixed;
+        inset: 0;
+        overflow: hidden;
+      }
+      .star {
+        position: absolute;
+        border-radius: 50%;
+        background: #fff;
+        animation: twinkle ease-in-out infinite;
+        will-change: opacity;
+      }
+      @keyframes twinkle {
+        0%,
+        100% {
+          opacity: var(--min-op);
+        }
+        50% {
+          opacity: var(--max-op);
+        }
+      }
+      .moon-wrap {
+        position: fixed;
+        top: 4%;
+        right: 6%;
+        z-index: 2;
+        display: flex;
+        width: 220px;
+        height: 220px;
+        align-items: center;
+        justify-content: center;
+      }
+      .moon {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle at 35% 30%,
+          #fff 0%,
+          #f6f4e9 55%,
+          #f5edce 100%
+        );
+        box-shadow:
+          0 0 34px 16px rgba(255, 224, 130, 0.6),
+          0 0 80px 46px rgba(255, 200, 90, 0.32),
+          0 0 140px 80px rgba(255, 180, 70, 0.14);
+      }
+      .person-container {
+        position: fixed;
+        z-index: 2;
+        bottom: 0;
+        left: 50%;
+        width: 40vw;
+        transform: translateX(-50%);
+        pointer-events: none;
+      }
+      .person-image {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+      .shooting-star {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: var(--tail, 140px);
+        height: 2px;
+        border-radius: 999px;
+        pointer-events: none;
+        opacity: 0;
+        transform-origin: 100% 50%;
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(190, 220, 255, 0.06) 25%,
+          rgba(210, 232, 255, 0.5) 70%,
+          rgba(255, 255, 255, 0.95) 100%
+        );
+        filter: drop-shadow(0 0 6px rgba(190, 225, 255, 0.75));
+      }
+      .shooting-star::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        right: 0;
+        width: var(--head, 3px);
+        height: var(--head, 3px);
+        transform: translate(50%, -50%);
+        border-radius: 50%;
+        background: #fff;
+        box-shadow:
+          0 0 6px 2px rgba(255, 255, 255, 0.9),
+          0 0 14px 5px rgba(170, 215, 255, 0.55);
+      }
+      .shooting-star.run {
+        animation: shoot linear forwards;
+      }
+      @keyframes shoot {
+        0% {
+          opacity: 0;
+          transform: translate3d(var(--x0), var(--y0), 0)
+            rotate(var(--angle, 45deg));
+        }
+        6%,
+        62% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+          transform: translate3d(var(--x1), var(--y1), 0)
+            rotate(var(--angle, 45deg));
+        }
+      }
+      #lanternLayer {
+        position: fixed;
+        inset: 0;
+        z-index: 1;
+        overflow: hidden;
+        pointer-events: none;
+      }
+      #lanternLayer.can-click {
+        pointer-events: auto;
+        z-index: 5;
+      }
+      .lantern {
+        position: absolute;
+        bottom: -240px;
+        left: var(--lantern-left);
+        width: var(--lantern-size);
+        opacity: 0;
+        cursor: default;
+        transform: translateX(-50%);
+        filter: drop-shadow(0 0 8px rgba(255, 190, 72, 0.32));
+        animation: lanternRise var(--lantern-duration) linear
+          var(--lantern-delay) forwards;
+        will-change: transform, opacity;
+      }
+      #lanternLayer.can-click .lantern {
+        cursor: pointer;
+      }
+      #lanternLayer.can-click .lantern:hover {
+        filter: drop-shadow(0 0 8px rgba(255, 202, 90, 0.9))
+          drop-shadow(0 0 25px rgba(255, 115, 47, 0.55));
+        transform: translateX(-50%) scale(1.12);
+      }
+      @keyframes lanternRise {
+        0% {
+          opacity: 0;
+          transform: translate3d(-50%, 0, 0) rotate(-4deg) scale(0.86);
+        }
+        8% {
+          opacity: var(--lantern-opacity);
+        }
+        40% {
+          transform: translate3d(calc(-50% + var(--lantern-drift)), -48vh, 0)
+            rotate(4deg) scale(1);
+        }
+        82% {
+          opacity: var(--lantern-opacity);
+        }
+        100% {
+          opacity: 0;
+          transform: translate3d(calc(-50% - var(--lantern-drift)), -135vh, 0)
+            rotate(-3deg) scale(0.96);
+        }
+      }
+      .lantern.is-opened {
+        pointer-events: none;
+        animation: lanternClicked 700ms ease-out forwards;
+      }
+      @keyframes lanternClicked {
+        from {
+          opacity: 1;
+          transform: translateX(-50%) scale(1);
+        }
+        to {
+          opacity: 0;
+          transform: translate3d(-50%, -120px, 0) rotate(8deg) scale(1.3);
+        }
+      }
+      .text-stage {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        z-index: 3;
+        display: flex;
+        width: min(700px, 80vw);
+        min-height: 180px;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        transform: translate(-50%, -50%);
+      }
+      .sentence {
+        color: #ffe7a3;
+        font-family: "Roboto Mono", monospace;
+        font-size: clamp(1rem, 2.5vw, 3rem);
+        font-weight: 400;
+        line-height: 1.45;
+        letter-spacing: 0.01em;
+        text-shadow:
+          0 0 10px rgba(255, 231, 163, 0.22),
+          0 0 30px rgba(255, 210, 112, 0.1);
+      }
+      .word {
+        display: inline-block;
+        margin-right: 0.24em;
+        opacity: 0;
+        transform: translateY(55px);
+        will-change: transform, opacity;
+      }
+      .word.show {
+        animation: wordIn 700ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+      .word.hide {
+        animation: wordOut 650ms cubic-bezier(0.7, 0, 0.84, 0) forwards;
+      }
+      .made-with-love {
+        margin-top: 18px;
+        color: rgba(255, 231, 163, 0.52);
+        font-size: 0.62rem;
+        line-height: 1.5;
+        letter-spacing: 0.03em;
+      }
+      @keyframes wordIn {
+        from {
+          opacity: 0;
+          filter: blur(5px);
+          transform: translateY(55px);
+        }
+        to {
+          opacity: 1;
+          filter: blur(0);
+          transform: translateY(0);
+        }
+      }
+      @keyframes wordOut {
+        from {
+          opacity: 1;
+          filter: blur(0);
+          transform: translateY(0);
+        }
+        to {
+          opacity: 0;
+          filter: blur(4px);
+          transform: translateY(-65px);
+        }
+      }
+      .love-dialog,
+      .lantern-dialog {
+        position: fixed;
+        margin: auto;
+        padding: 0;
+        overflow: hidden;
+        color: #fff4d2;
+        font-family: "Roboto Mono", monospace;
+        text-align: center;
+      }
+      .love-dialog {
+        width: min(500px, calc(100vw - 32px));
+        border: 1px solid rgba(255, 231, 163, 0.6);
+        border-radius: 24px;
+        background:
+          radial-gradient(
+            circle at 50% 0%,
+            rgba(117, 81, 187, 0.3),
+            transparent 52%
+          ),
+          linear-gradient(145deg, rgba(19, 15, 45, 0.98), rgba(4, 5, 16, 0.98));
+        box-shadow:
+          0 0 20px rgba(255, 223, 140, 0.16),
+          0 0 80px rgba(122, 76, 194, 0.22),
+          0 24px 70px rgba(0, 0, 0, 0.65);
+      }
+      .lantern-dialog {
+        width: min(440px, calc(100vw - 32px));
+        border: 1px solid rgba(255, 217, 124, 0.58);
+        border-radius: 24px;
+        background:
+          radial-gradient(
+            circle at 50% 0%,
+            rgba(255, 159, 49, 0.25),
+            transparent 46%
+          ),
+          linear-gradient(145deg, rgba(42, 13, 26, 0.98), rgba(11, 7, 25, 0.98));
+        box-shadow:
+          0 0 24px rgba(255, 190, 75, 0.2),
+          0 0 85px rgba(255, 94, 66, 0.16),
+          0 24px 70px rgba(0, 0, 0, 0.68);
+      }
+      .love-dialog::backdrop,
+      .lantern-dialog::backdrop {
+        background: rgba(0, 0, 0, 0.66);
+        backdrop-filter: blur(6px);
+      }
+      .love-dialog[open] {
+        animation: dialogIn 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+      }
+      .lantern-dialog[open] {
+        animation: dialogIn 500ms cubic-bezier(0.16, 1, 0.3, 1) both;
+      }
+      @keyframes dialogIn {
+        from {
+          opacity: 0;
+          transform: translateY(24px) scale(0.92);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+      .dialog-stars {
+        display: flex;
+        padding: 17px 28px 0;
+        align-items: center;
+        justify-content: space-between;
+        color: #ffe7a3;
+        font-size: 1rem;
+        opacity: 0.8;
+        text-shadow: 0 0 10px rgba(255, 231, 163, 0.8);
+      }
+      .dialog-close {
+        position: absolute;
+        top: 12px;
+        right: 14px;
+        display: grid;
+        width: 34px;
+        height: 34px;
+        border: 0;
+        border-radius: 50%;
+        place-items: center;
+        color: rgba(255, 244, 210, 0.8);
+        background: transparent;
+        cursor: pointer;
+        font-size: 1.8rem;
+        line-height: 1;
+        transition:
+          color 0.18s,
+          background 0.18s,
+          transform 0.18s;
+      }
+      .dialog-close:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.1);
+        transform: rotate(90deg);
+      }
+      #questionContent,
+      .answer-content {
+        padding: 24px 34px 34px;
+      }
+      .dialog-kicker,
+      .lantern-dialog-kicker {
+        margin-bottom: 14px;
+        color: #f8cf6b;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      .dialog-question {
+        margin: 0;
+        color: #fff1c4;
+        font:
+          500 1rem/1.5 "Roboto Mono",
+          monospace;
+        text-shadow:
+          0 0 12px rgba(255, 231, 163, 0.25),
+          0 0 32px rgba(255, 204, 100, 0.12);
+      }
+      .dialog-subtitle {
+        max-width: 360px;
+        margin: 18px auto 26px;
+        color: rgba(255, 244, 210, 0.72);
+        font-size: 0.8rem;
+        line-height: 1.75;
+      }
+      .dialog-actions {
+        display: grid;
+        gap: 12px;
+      }
+      .answer-btn {
+        display: flex;
+        min-height: 52px;
+        border-radius: 14px;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 0.82rem;
+        font-weight: 600;
+        transition:
+          transform 0.18s,
+          box-shadow 0.18s,
+          background 0.18s;
+      }
+      .answer-btn:hover {
+        transform: translateY(-3px);
+      }
+      .answer-btn:active {
+        transform: translateY(0) scale(0.98);
+      }
+      .answer-yes {
+        border: 1px solid rgba(255, 233, 172, 0.8);
+        color: #2c1a05;
+        background: linear-gradient(135deg, #fff1b8, #f6c85f);
+        box-shadow: 0 8px 25px rgba(255, 200, 90, 0.22);
+      }
+      .answer-cute {
+        border: 1px solid rgba(255, 231, 163, 0.28);
+        color: #ffe7a3;
+        background: rgba(255, 255, 255, 0.06);
+      }
+      .answer-heart {
+        margin-bottom: 15px;
+        color: #ff9cba;
+        font-size: 3.5rem;
+        line-height: 1;
+        animation: heartBeat 1.4s ease-in-out infinite;
+        text-shadow:
+          0 0 12px rgba(255, 114, 162, 0.75),
+          0 0 35px rgba(255, 114, 162, 0.35);
+      }
+      @keyframes heartBeat {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.14);
+        }
+      }
+      .answer-title {
+        margin: 0 0 12px;
+        color: #fff1c4;
+        font-size: clamp(1.2rem, 4vw, 1.8rem);
+        font-weight: 500;
+      }
+      .answer-message,
+      .lantern-wish-message {
+        margin: 0 auto 25px;
+        color: rgba(255, 244, 210, 0.76);
+        font-size: 0.8rem;
+        line-height: 1.75;
+      }
+      .restart-btn {
+        min-height: 45px;
+        padding: 0 20px;
+        border: 1px solid rgba(255, 231, 163, 0.45);
+        border-radius: 12px;
+        color: #ffe7a3;
+        background: rgba(255, 255, 255, 0.07);
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 0.76rem;
+        transition:
+          transform 0.18s,
+          background 0.18s;
+      }
+      .restart-btn:hover {
+        background: rgba(255, 255, 255, 0.14);
+        transform: translateY(-2px);
+      }
+      .lantern-dialog-content {
+        padding: 38px 34px 34px;
+      }
+      .lantern-dialog-icon {
+        margin-bottom: 12px;
+        font-size: 3.4rem;
+        animation: lanternIconFloat 2.2s ease-in-out infinite;
+        filter: drop-shadow(0 0 12px rgba(255, 183, 57, 0.62));
+      }
+      /* =========================
+   MÀN HÌNH CHẠM ĐỂ BẮT ĐẦU
+   ========================= */
+
+      .start-screen {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        display: grid;
+        padding: 24px;
+        place-items: center;
+        overflow: hidden;
+        color: #fff1c4;
+        background:
+          radial-gradient(
+            circle at 50% 32%,
+            rgba(103, 77, 177, 0.32) 0%,
+            transparent 32%
+          ),
+          radial-gradient(
+            circle at 50% 80%,
+            rgba(114, 48, 115, 0.18) 0%,
+            transparent 55%
+          ),
+          rgba(2, 2, 10, 0.97);
+        cursor: pointer;
+        font-family: "Roboto Mono", monospace;
+        text-align: center;
+        user-select: none;
+        transition:
+          opacity 900ms ease,
+          visibility 900ms ease;
+      }
+
+      .start-screen::before,
+      .start-screen::after {
+        position: absolute;
+        content: "";
+        border-radius: 50%;
+        pointer-events: none;
+      }
+
+      .start-screen::before {
+        top: 12%;
+        left: 14%;
+        width: 3px;
+        height: 3px;
+        background: #ffffff;
+        box-shadow:
+          11vw 7vh 0 0 rgba(255, 255, 255, 0.8),
+          26vw 20vh 0 0 rgba(255, 255, 255, 0.6),
+          63vw 4vh 0 0 rgba(255, 255, 255, 0.8),
+          72vw 27vh 0 0 rgba(255, 255, 255, 0.55),
+          39vw 53vh 0 0 rgba(255, 255, 255, 0.65),
+          5vw 65vh 0 0 rgba(255, 255, 255, 0.65),
+          78vw 70vh 0 0 rgba(255, 255, 255, 0.8);
+      }
+
+      .start-screen::after {
+        bottom: -140px;
+        left: 50%;
+        width: 360px;
+        height: 360px;
+        border: 1px solid rgba(255, 223, 143, 0.14);
+        transform: translateX(-50%);
+        box-shadow:
+          0 0 50px rgba(255, 189, 92, 0.12),
+          inset 0 0 50px rgba(255, 189, 92, 0.08);
+      }
+
+      .start-screen.is-hidden {
+        visibility: hidden;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .start-screen-content {
+        position: relative;
+        z-index: 1;
+        max-width: 560px;
+        animation: startContentIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+      }
+
+      @keyframes startContentIn {
+        from {
+          opacity: 0;
+          transform: translateY(24px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .start-moon {
+        margin-bottom: 20px;
+        color: #fff0c1;
+        font-family: Georgia, serif;
+        font-size: 6rem;
+        line-height: 1;
+        text-shadow:
+          0 0 18px rgba(255, 237, 184, 0.8),
+          0 0 50px rgba(255, 189, 92, 0.38);
+        animation: moonFloat 3s ease-in-out infinite;
+      }
+
+      @keyframes moonFloat {
+        0%,
+        100% {
+          transform: translateY(0) rotate(-5deg);
+        }
+
+        50% {
+          transform: translateY(-11px) rotate(4deg);
+        }
+      }
+
+      .start-kicker {
+        margin-bottom: 16px;
+        color: #f8cf6b;
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      .start-title {
+        margin: 0;
+        color: #fff1c4;
+        font-family: "Roboto Mono", monospace;
+        font-size: clamp(1.4rem, 5vw, 2.4rem);
+        font-weight: 500;
+        line-height: 1.55;
+        text-shadow:
+          0 0 14px rgba(255, 231, 163, 0.25),
+          0 0 35px rgba(255, 204, 100, 0.16);
+      }
+
+      .start-hint {
+        margin-top: 22px;
+        color: rgba(255, 244, 210, 0.6);
+        font-size: 0.72rem;
+        line-height: 1.6;
+      }
+
+      .start-touch-icon {
+        display: inline-block;
+        margin-top: 26px;
+        color: #ffe7a3;
+        font-size: 2rem;
+        animation: touchPulse 1.5s ease-in-out infinite;
+        text-shadow: 0 0 12px rgba(255, 231, 163, 0.75);
+      }
+
+      @keyframes touchPulse {
+        0%,
+        100% {
+          opacity: 0.45;
+          transform: translateY(0) scale(1);
+        }
+
+        50% {
+          opacity: 1;
+          transform: translateY(8px) scale(1.16);
+        }
+      }
+
+      @media (max-width: 480px) {
+        .start-moon {
+          font-size: 5rem;
+        }
+
+        .start-title {
+          font-size: 1.3rem;
+          line-height: 1.65;
+        }
+
+        .start-hint {
+          font-size: 0.65rem;
+        }
+      }
+      @keyframes lanternIconFloat {
+        0%,
+        100% {
+          transform: translateY(0) rotate(-3deg);
+        }
+        50% {
+          transform: translateY(-9px) rotate(3deg);
+        }
+      }
+      .lantern-wish-title {
+        margin: 0 0 16px;
+        color: #fff0bc;
+        font-size: clamp(1.1rem, 4vw, 1.6rem);
+        font-weight: 500;
+        line-height: 1.5;
+      }
+      @media (max-width: 480px) {
+        .moon-wrap {
+          top: 3%;
+          right: 5%;
+          width: 100px;
+          height: 100px;
+        }
+        .moon {
+          width: 76px;
+          height: 76px;
+        }
+        .person-container {
+          width: 80vw;
+        }
+        .text-stage {
+          width: 90vw;
+          min-height: 150px;
+        }
+        .sentence {
+          font-size: clamp(1rem, 4.2vw, 1.45rem);
+          line-height: 1.55;
+        }
+        .love-dialog,
+        .lantern-dialog {
+          width: calc(100vw - 28px);
+          border-radius: 20px;
+        }
+        #questionContent,
+        .answer-content,
+        .lantern-dialog-content {
+          padding: 22px 22px 28px;
+        }
+        .dialog-question {
+          font-size: 0.9rem;
+        }
+        .dialog-subtitle,
+        .lantern-wish-message {
+          font-size: 0.74rem;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .star,
+        .word.show,
+        .word.hide,
+        .love-dialog[open],
+        .lantern,
+        .lantern-dialog[open],
+        .answer-heart,
+        .lantern-dialog-icon {
+          animation-duration: 1ms !important;
+          animation-iteration-count: 1 !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="sky">
+      <div class="moon-wrap"><div class="moon"></div></div>
+      <div class="person-container">
+        <img src="images/as.png" alt="" class="person-image" />
+      </div>
+      <div id="lanternLayer" aria-label="Những chiếc lồng đèn"></div>
+      <div class="text-stage">
+        <div id="animatedText" class="sentence" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <dialog id="loveDialog" class="love-dialog">
+      <div class="dialog-stars" aria-hidden="true">
+        <span>✦</span><span>·</span><span>✧</span><span>·</span><span>✦</span>
+      </div>
+      <button
+        id="closeDialog"
+        class="dialog-close"
+        type="button"
+        aria-label="Đóng câu hỏi"
+      >
+        ×
+      </button>
+      <div id="questionContent">
+        <p class="dialog-kicker">Một câu hỏi nhỏ cho Thương</p>
+        <h2 class="dialog-question">
+          Năm nay xa nhau một chút, nhưng những mùa trăng sau mình sẽ cùng nhau
+          đón Trung thu được không? 🌕
+        </h2>
+        <p class="dialog-subtitle">
+          Hẹn em những mùa Trung thu sau, khi mình được ở cạnh nhau. ❤️
+        </p>
+        <div class="dialog-actions">
+          <button class="answer-btn answer-yes" type="button" data-answer="yes">
+            <span>Được</span><span aria-hidden="true">♥</span>
+          </button>
+          <button
+            class="answer-btn answer-cute"
+            type="button"
+            data-answer="cute"
+          >
+            <span>Để em suy nghĩ</span><span aria-hidden="true">✦</span>
+          </button>
+        </div>
+      </div>
+      <div id="answerContent" class="answer-content" hidden>
+        <div class="answer-heart" aria-hidden="true">♥</div>
+        <h2 id="answerTitle" class="answer-title"></h2>
+        <p id="answerMessage" class="answer-message"></p>
+        <button id="closeAfterAnswerButton" class="restart-btn" type="button">
+          Đóng
+        </button>
+      </div>
+    </dialog>
+
+    <dialog id="lanternDialog" class="lantern-dialog">
+      <button
+        id="closeLanternDialog"
+        class="dialog-close"
+        type="button"
+        aria-label="Đóng lời chúc"
+      >
+        ×
+      </button>
+      <div class="lantern-dialog-content">
+        <div class="lantern-dialog-icon" aria-hidden="true">🏮</div>
+        <p class="lantern-dialog-kicker">Một lời chúc dành cho em</p>
+        <h2 id="lanternWishTitle" class="lantern-wish-title"></h2>
+        <p id="lanternWishMessage" class="lantern-wish-message"></p>
+        <button id="lanternDialogButton" class="restart-btn" type="button">
+          Cảm ơn anh ♥
+        </button>
+        <p class="made-with-love">Được làm riêng cho Linh, bởi anh ♥</p>
+      </div>
+    </dialog>
+    <audio loop preload="auto" id="bgMusic">
+      <source src="audio-bg.mp3" type="audio/mpeg" />
+    </audio>
+    <div id="startScreen" class="start-screen" role="button" tabindex="0">
+      <div class="start-screen-content">
+        <div class="start-moon" aria-hidden="true">☾</div>
+
+        <p class="start-kicker">Một món quà nhỏ dành cho em</p>
+
+        <h1 class="start-title">
+          Chạm vào màn hình<br />
+          để mở ra nhé ♥
+        </h1>
+
+        <p class="start-hint">Và nhớ bật âm lượng một chút nhé</p>
+
+        <span class="start-touch-icon" aria-hidden="true">⌁</span>
+      </div>
+    </div>
+
+    <script>
+      const girlNames = "Thương";
+      const sky = document.getElementById("sky"),
+        textElement = document.getElementById("animatedText");
+      const rand = (min, max) => min + Math.random() * (max - min);
+      const frag = document.createDocumentFragment();
+      for (let i = 0; i < 300; i++) {
+        const s = document.createElement("div");
+        s.className = "star";
+        const r = Math.random();
+        let size, minOp, maxOp, glow;
+        if (r > 0.92) {
+          size = 1.5 + Math.random() * 1.2;
+          minOp = 0.5;
+          maxOp = 1;
+          glow = size * 1.8;
+        } else if (r > 0.65) {
+          size = 1.2 + Math.random();
+          minOp = 0.25;
+          maxOp = 0.85;
+          glow = size * 1.4;
+        } else {
+          size = 0.5 + Math.random() * 0.8;
+          minOp = 0.05;
+          maxOp = 0.5;
+          glow = 0;
+        }
+        s.style.width = s.style.height = size + "px";
+        s.style.left = Math.random() * 100 + "%";
+        s.style.top = Math.random() * 100 + "%";
+        s.style.setProperty("--min-op", minOp);
+        s.style.setProperty("--max-op", maxOp);
+        if (glow)
+          s.style.boxShadow = `0 0 ${glow}px ${glow / 2}px rgba(255,255,255,${maxOp * 0.55})`;
+        const d = 2 + Math.random() * 4;
+        s.style.animationDuration = d + "s";
+        s.style.animationDelay = "-" + (Math.random() * d).toFixed(2) + "s";
+        frag.appendChild(s);
+      }
+      sky.appendChild(frag);
+      const reduceMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+      if (!reduceMotion) {
+        const shooters = [];
+        for (let i = 0; i < 5; i++) {
+          const el = document.createElement("div");
+          el.className = "shooting-star";
+          sky.appendChild(el);
+          shooters.push(el);
+        }
+        function schedule(el) {
+          setTimeout(() => launch(el), rand(1500, 9000));
+        }
+        function launch(el) {
+          if (document.hidden) return schedule(el);
+          const vw = innerWidth,
+            vh = innerHeight,
+            angle = rand(40, 50),
+            rad = (angle * Math.PI) / 180,
+            x0 = rand(-0.05, 0.15) * vw,
+            y0 = rand(-0.2, 0.15) * vh,
+            need = Math.min(
+              (vw - x0) / Math.cos(rad),
+              (vh - y0) / Math.sin(rad),
+            ),
+            dist = need * rand(1.02, 1.18),
+            x1 = x0 + Math.cos(rad) * dist,
+            y1 = y0 + Math.sin(rad) * dist;
+          el.style.setProperty("--x0", x0.toFixed(1) + "px");
+          el.style.setProperty("--y0", y0.toFixed(1) + "px");
+          el.style.setProperty("--x1", x1.toFixed(1) + "px");
+          el.style.setProperty("--y1", y1.toFixed(1) + "px");
+          el.style.setProperty("--angle", angle.toFixed(1) + "deg");
+          el.style.setProperty("--tail", rand(90, 200).toFixed(0) + "px");
+          el.style.setProperty("--head", rand(2, 3.4).toFixed(1) + "px");
+          el.style.animationDuration =
+            Math.min(2, Math.max(0.5, dist / rand(1100, 1900))).toFixed(2) +
+            "s";
+          el.classList.remove("run");
+          void el.offsetWidth;
+          el.classList.add("run");
+          el.onanimationend = () => {
+            el.classList.remove("run");
+            schedule(el);
+          };
+        }
+        shooters.forEach((el, i) =>
+          setTimeout(() => launch(el), 600 + i * rand(900, 2500)),
+        );
+      }
+      const lanternLayer = document.getElementById("lanternLayer");
+      const lanternImages = [
+        "images/lantern.png",
+        "images/lantern.png",
+        "images/lantern.png",
+        "images/lantern.png",
+      ];
+      const lanternWishes = [
+        {
+          title: `Trung Thu vui vẻ nhé, ${girlNames} ♥`,
+          message:
+            "Chúc em có một mùa Trung Thu thật ấm áp, luôn vui vẻ và luôn giữ nụ cười xinh đẹp ấy nhé.",
+        },
+        {
+          title: "Chúc em luôn bình an ✦",
+          message:
+            "Dù hôm nay, ngày mai hay những ngày sau nữa, anh vẫn mong em luôn bình an và hạnh phúc.",
+        },
+        {
+          title: "Một chiếc lồng đèn cho em 🏮",
+          message:
+            "Anh mong mỗi ánh đèn em nhìn thấy đều khiến em nhớ rằng có một người luôn nghĩ về em.",
+        },
+        {
+          title: "Trăng tròn rồi đó em",
+          message:
+            "Mong rằng mùa trăng này và những mùa trăng về sau, anh vẫn có thể ở cạnh em.",
+        },
+        {
+          title: "Chúc em thật nhiều niềm vui",
+          message:
+            "Mong mọi điều dịu dàng nhất sẽ đến với em, không chỉ trong đêm Trung Thu này.",
+        },
+        {
+          title: "Anh nhớ em",
+          message:
+            "Giữa rất nhiều ánh đèn, anh vẫn mong được nhìn thấy nụ cười của em nhiều nhất.",
+        },
+        {
+          title: "Điều nhỏ xíu anh muốn nói",
+          message:
+            "Cảm ơn em vì đã xuất hiện và khiến những ngày bình thường của anh trở nên đặc biệt hơn.",
+        },
+        {
+          title: "Mùa trăng của chúng mình",
+          message:
+            "Anh hy vọng những mùa Trung Thu về sau, anh vẫn được cùng em ngắm trăng, ăn bánh và kể nhau nghe những điều nhỏ bé.",
+        },
+        {
+          title: "Một lời hứa dịu dàng",
+          message:
+            "Anh không hứa mọi ngày đều hoàn hảo, nhưng anh hứa sẽ luôn cố gắng để ở bên em khi em cần.",
+        },
+        {
+          title: "Chúc cô gái của anh",
+          message:
+            "Luôn xinh đẹp, rạng rỡ, nhiều niềm vui và nhận được thật nhiều yêu thương mỗi ngày.",
+        },
+      ];
+      let lanternClickEnabled = false;
+      const lanternDialog = document.getElementById("lanternDialog"),
+        lanternWishTitle = document.getElementById("lanternWishTitle"),
+        lanternWishMessage = document.getElementById("lanternWishMessage");
+      function openLanternDialog(wish) {
+        lanternWishTitle.textContent = wish.title;
+        lanternWishMessage.textContent = wish.message;
+        if (!lanternDialog.open) lanternDialog.showModal();
+      }
+      function createLantern() {
+        const l = document.createElement("img");
+        l.className = "lantern";
+        l.src = lanternImages[Math.floor(Math.random() * lanternImages.length)];
+        l.alt = lanternClickEnabled ? "Lồng đèn, chạm để nhận lời chúc" : "";
+        // l.style.setProperty("--lantern-size", rand(52, 120) + "px");
+        const isMobile = window.matchMedia("(max-width: 480px)").matches;
+
+        const lanternSize = isMobile ? rand(32, 72) : rand(52, 120);
+
+        l.style.setProperty("--lantern-size", lanternSize + "px");
+        l.style.setProperty("--lantern-left", rand(4, 96) + "%");
+        l.style.setProperty("--lantern-duration", rand(11, 19) + "s");
+        l.style.setProperty("--lantern-delay", rand(0, 1.2) + "s");
+        l.style.setProperty("--lantern-drift", rand(-70, 70) + "px");
+        l.style.setProperty("--lantern-opacity", rand(0.72, 1));
+        l.addEventListener("animationend", () => l.remove());
+        l.addEventListener("click", () => {
+          if (!lanternClickEnabled || l.classList.contains("is-opened")) return;
+          l.classList.add("is-opened");
+          openLanternDialog(
+            lanternWishes[Math.floor(Math.random() * lanternWishes.length)],
+          );
+        });
+        lanternLayer.appendChild(l);
+      }
+      // function startLanterns() {
+      //   for (let i = 0; i < 5; i++) setTimeout(createLantern, i * 550);
+      //   (function next() {
+      //     setTimeout(
+      //       () => {
+      //         createLantern();
+      //         next();
+      //       },
+      //       rand(1500, 2400),
+      //     );
+      //   })();
+      // }
+
+      function startLanterns() {
+        const initialLanternCount = 6;
+
+        for (let i = 0; i < initialLanternCount; i++) {
+          setTimeout(() => {
+            createLantern();
+          }, i * 1100);
+        }
+        function scheduleNextLantern() {
+          const nextDelay = rand(2500, 4000);
+
+          setTimeout(() => {
+            createLantern();
+            scheduleNextLantern();
+          }, nextDelay);
+        }
+
+        scheduleNextLantern();
+      }
+      function enableLanternClick() {
+        if (lanternClickEnabled) return;
+        lanternClickEnabled = true;
+        lanternLayer.classList.add("can-click");
+        document
+          .querySelectorAll(".lantern")
+          .forEach((l) => (l.alt = "Lồng đèn, chạm để nhận lời chúc"));
+      }
+      const sentences = [
+        `${girlNames} à, Trung Thu sắp tới rồi, tự nhiên anh chỉ nghĩ đến việc được ở cạnh em.`,
+        "Anh muốn dành một buổi tối chỉ để đi cùng em, không vội vã, không lo toan.",
+        "Mình có thể cùng nhau đi ngắm đèn lồng, ăn chút bánh Trung Thu, rồi lang thang nói chuyện.",
+        "Không cần gì quá cầu kỳ, chỉ cần có nhau là anh thấy đủ vui rồi.",
+        "Trung Thu năm nay, điều anh mong nhất không phải bánh hay đèn lồng, mà là được ở cạnh em.",
+        "Và anh hy vọng mỗi mùa trăng sau này vẫn sẽ có em bên cạnh.",
+      ];
+      const config = {
+        wordInDelay: 150,
+        wordInDuration: 800,
+        readTime: 0,
+        wordOutDelay: 200,
+        wordOutDuration: 650,
+        nextSentenceDelay: 100,
+      };
+      const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+      function createWords(sentence) {
+        textElement.innerHTML = "";
+        return sentence
+          .trim()
+          .split(/\s+/)
+          .map((word) => {
+            const span = document.createElement("span");
+            span.className = "word";
+            span.textContent = word;
+            textElement.appendChild(span);
+            return span;
+          });
+      }
+      async function showSentence(sentence) {
+        const words = createWords(sentence);
+        for (const word of words) {
+          word.classList.add("show");
+          await wait(config.wordInDelay);
+        }
+        await wait(config.wordInDuration + config.readTime);
+        for (const word of words) {
+          word.classList.remove("show");
+          word.classList.add("hide");
+          await wait(config.wordOutDelay);
+        }
+        await wait(config.wordOutDuration + config.nextSentenceDelay);
+      }
+      const loveDialog = document.getElementById("loveDialog"),
+        closeDialog = document.getElementById("closeDialog"),
+        questionContent = document.getElementById("questionContent"),
+        answerContent = document.getElementById("answerContent"),
+        answerTitle = document.getElementById("answerTitle"),
+        answerMessage = document.getElementById("answerMessage"),
+        closeAfterAnswerButton = document.getElementById(
+          "closeAfterAnswerButton",
+        );
+      function openLoveDialog() {
+        questionContent.hidden = false;
+        answerContent.hidden = true;
+        if (!loveDialog.open) loveDialog.showModal();
+      }
+      function showAnswer(answer) {
+        questionContent.hidden = true;
+        answerContent.hidden = false;
+        if (answer === "yes") {
+          answerTitle.textContent = "Anh vui lắm ♥";
+          answerMessage.textContent =
+            "Vậy thì hẹn em, không chỉ Trung Thu năm nay, mà cả những mùa trăng sau nữa. 🌕❤️";
+        } else {
+          answerTitle.textContent = "Anh sẽ chờ em nhé ✦";
+          answerMessage.textContent =
+            "Em cứ suy nghĩ thật thoải mái nhé. Dù thế nào, anh vẫn mong em sẽ có một mùa Trung Thu thật vui.";
+        }
+      }
+      function closeMainDialogAndEnableLanterns() {
+        loveDialog.close();
+        enableLanternClick();
+      }
+      closeDialog.addEventListener("click", closeMainDialogAndEnableLanterns);
+      closeAfterAnswerButton.addEventListener(
+        "click",
+        closeMainDialogAndEnableLanterns,
+      );
+      loveDialog.addEventListener("cancel", () =>
+        setTimeout(enableLanternClick, 100),
+      );
+      document
+        .querySelectorAll(".answer-btn")
+        .forEach((b) =>
+          b.addEventListener("click", () => showAnswer(b.dataset.answer)),
+        );
+      document
+        .getElementById("closeLanternDialog")
+        .addEventListener("click", () => lanternDialog.close());
+      document
+        .getElementById("lanternDialogButton")
+        .addEventListener("click", () => lanternDialog.close());
+      async function runAnimation() {
+        for (const sentence of sentences) await showSentence(sentence);
+        openLoveDialog();
+      }
+      /* =========================
+   CHẠM MÀN HÌNH ĐỂ BẮT ĐẦU
+   ========================= */
+
+      const bgMusic = document.getElementById("bgMusic");
+      const startScreen = document.getElementById("startScreen");
+
+      let hasStarted = false;
+
+      /*
+  Âm lượng từ 0 đến 1.
+  0.18 = 18%, phù hợp cho nhạc nền.
+*/
+      bgMusic.volume = 0.18;
+
+      async function startExperience() {
+        if (hasStarted) {
+          return;
+        }
+
+        hasStarted = true;
+
+        /*
+    Vì play() nằm trực tiếp trong sự kiện click/touch,
+    đa số browser sẽ cho phép phát nhạc có tiếng.
+  */
+        try {
+          await bgMusic.play();
+        } catch (error) {
+          /*
+      Nếu thiết bị vẫn chặn nhạc vì lý do nào đó,
+      animation vẫn tiếp tục chạy bình thường.
+    */
+          console.warn("Không thể phát nhạc:", error);
+        }
+
+        /*
+    Màn hình mở đầu mờ dần rồi biến mất.
+  */
+        startScreen.classList.add("is-hidden");
+
+        /*
+    Sau khi người dùng đã chạm:
+    - Bắt đầu lồng đèn.
+    - Bắt đầu text animation.
+  */
+        startLanterns();
+        runAnimation();
+
+        /*
+    Xóa hẳn overlay khỏi DOM sau khi fade-out xong.
+  */
+        setTimeout(() => {
+          startScreen.remove();
+        }, 1000);
+      }
+
+      /*
+  Dùng pointerdown để hỗ trợ cả:
+  - Click chuột trên desktop.
+  - Chạm trên điện thoại/tablet.
+*/
+      startScreen.addEventListener("pointerdown", startExperience, {
+        once: true,
+      });
+
+      /*
+  Hỗ trợ dùng bàn phím:
+  Enter hoặc Space khi focus vào màn hình mở đầu.
+*/
+      startScreen.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          startExperience();
+        }
+      });
+    </script>
+  </body>
+</html>
